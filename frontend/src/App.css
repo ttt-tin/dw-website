@@ -1,6 +1,6 @@
 .App {
   text-align: center;
-  background-image: url('../public/Dog.webp');
+  /* background-image: url('../public/Dog.webp'); */
   background-size: cover;
   background-position: center;
   min-height: 100vh;

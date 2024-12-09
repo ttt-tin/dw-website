@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, InputNumber, Select, Button, Typography, Row, Col } from 'antd';
 import './App.css';
 import axios from 'axios';
@@ -7,35 +7,36 @@ const { Title } = Typography;
 const { Option } = Select;
 
 const App: React.FC = () => {
+  const [result, setResult] = useState<string | null>(null); // State to store the result
+
   const onFinish = (values: any) => {
     const data = Object.values(values);
-    axios.post('http://127.0.0.1:8000/predict', {data: data}).then((res) => {
-      if (res.data.prediction == 0) {
-        alert('Art');
-      }
-      else if (res.data.prediction == 1) {
-        alert('Commere');
-      }
-      else {
-        alert('Science');
-      }
-    })
-      .catch((err) => {
-        console.log(err)
+    axios
+      .post('http://127.0.0.1:8000/predict', { data: data })
+      .then((res) => {
+        let predictionResult = '';
+        if (res.data.prediction === 0) {
+          predictionResult = 'Art';
+        } else if (res.data.prediction === 1) {
+          predictionResult = 'Commerce';
+        } else {
+          predictionResult = 'Science';
+        }
+        setResult(`Kết quả: ${predictionResult}`); // Set the result
       })
+      .catch((err) => {
+        console.log(err);
+        setResult('Kết quả: Lỗi khi lấy dữ liệu'); // Handle error state
+      });
   };
 
   return (
     <div className="App">
-      <div style={{
-        margin: 40
-      }}>
+      <div style={{ margin: 40 }}>
+        <header className="App-header">
+          <Title level={3}>Xem bạn hợp với nhóm học sinh nào</Title>
+        </header>
 
-        <div>
-          <header className="App-header">
-            <Title level={3}>Xem bạn hợp với tự nhiên hay xã hội hơn</Title>
-          </header>
-        </div>
         <Form
           name="user-form"
           onFinish={onFinish}
@@ -97,8 +98,6 @@ const App: React.FC = () => {
                 <InputNumber min={0} max={100} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-
-            {/* Trường chọn */}
             <Col span={4}>
               <Form.Item
                 name="morther_education"
@@ -172,14 +171,19 @@ const App: React.FC = () => {
             </Col>
           </Row>
 
-          {/* Nút gửi */}
           <Form.Item>
-            <Button type='primary' htmlType="submit">
+            <Button type="primary" htmlType="submit">
               Gửi
             </Button>
           </Form.Item>
         </Form>
 
+        {/* Display the result at the bottom of the page */}
+        {result && (
+          <Typography.Title level={3}>
+            {result}
+          </Typography.Title>
+        )}
       </div>
     </div>
   );
